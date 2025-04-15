@@ -1,4 +1,4 @@
-training_mode: 'crossvalidate' #'full': no test data, utilize the full testsuite; "crossvalidate" for crossfold validation
+training_mode: 'full' #'full': no test data, utilize the full testsuite; "crossvalidate" for crossfold validation
 data_dir: data/
 model_dir: data/saved_models
 experiment_name: bidirectional_lstm

@@ -35,7 +35,7 @@ Make sure you have ```curl```. If a compatible extractor (e.g. unrar or WinRAR) 
 ```
 python -m venv its4sdc_venv
 its4sdc_venv\Scripts\activate # (Windows)
-source /its4sdc_venv/bin/activate # (Linux/Mac)
+source its4sdc_venv/bin/activate # (Linux/Mac)
 
 ```
 
