@@ -181,7 +181,6 @@ if __name__ == "__main__":
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
     config = load_config(args.config)
-    print("Config loaded:", config)
 
     lstm_cells = config.get('parameters', {}).get('lstm_cells', 220)
     learning_rate = config.get('parameters', {}).get('learning_rate', 1e-3)

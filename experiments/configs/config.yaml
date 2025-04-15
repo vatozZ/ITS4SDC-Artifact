@@ -4,9 +4,9 @@ model_dir: data/saved_models
 experiment_name: bidirectional_lstm
 combined_dataset_filename: 'dataset_combined.json'
 interpolated_road_points_size: 197
-k_fold: 10
+k_fold: 5
 parameters:
   lstm_cells: 220
   learning_rate: 0.001
   batch_size: 128
-  epochs: 100
+  epochs: 1

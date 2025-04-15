@@ -7,7 +7,7 @@ This repository contains the **replication package** for the paper
 
 It includes:
 - The source code of the tool,
-- Scripts for dataset preperation and preprocessing,
+- Scripts for dataset preparation and preprocessing,
 - Configuration files for training
 - Model training and evaluation logic.
 
@@ -22,15 +22,30 @@ cd ITS4SDC-Artifact
 ```
 
 ### 2. Download and extract the dataset
-```
+On a Windows machine,<br/> 
+double click to **download_data_windows** file, it will automatically download the dataset. <br/> <br/>
+On a Linux machine, <br/>
+open the terminal inside of the **ITS4SDC-Artifact** folder and run following command:
+```bash
 bash download_data.sh
 ```
-Make sure you have ```curl``` and a compatäble extractor (e-g- unrar or WinRAR) installed.
+Make sure you have ```curl```. If a compatible extractor (e.g. unrar or WinRAR) is not installed, it will install the **unrar** package.
 
-### 3. Create a virtual environment (recommended)
+### (Recommended) Create and activate a virtual environment
 ```
-python -m venv its4sdc python==???
+python -m venv its4sdc_venv
+its4sdc_venv\Scripts\activate # (Windows)
+source /its4sdc_venv/bin/activate # (Linux/Mac)
+
 ```
+
+### 3. Install the dependencies 
+```
+python -m pip install --upgrade pip
+
+pip install -r requirements.txt
+```
+
 
 ### 4. Run the Experiment
 For full training (utilizes the full dataset):
@@ -38,16 +53,10 @@ For full training (utilizes the full dataset):
 python src/run.py
 ```
 
-For cross-validation, in ```config.yaml```, change:
+For cross-validation change the following parameters from the  ```config.yaml``` file and run the program again:
 ```
 training_mode: crossvalidate
 k_fold: 10
-```
-
-Then run: 
-
-```
-python src/run.py
 ```
 
 ### Outputs
@@ -60,9 +69,9 @@ The dataset is available on Zenodo:
 https://zenodo.org/records/14599223 <br/>
 Size ~ 329.2 MB
 Format: ```.json``` files per test case with road points and test outcomes (PASS/FAIL) for ETK-800 model vehicle with the following parameters:
->- Risk Factor: 1.5
->- Out-of-Bound Tolerance: %50
->- Maximum Speed: 120 km/h
+- Risk Factor: 1.5
+- Out-of-Bound Tolerance: 50%
+- Maximum Speed: 120 km/h
 
 If you use this tool or dataset, please cite the paper:
 
@@ -76,8 +85,7 @@ month={April}, <br/>
 year={2025}<br/>
 }
 
-For questions, please contact:
->ali.ihsan.gullu@ut.ee
+For questions, please contact: *ali.ihsan.gullu@ut.ee*
 
 
 
