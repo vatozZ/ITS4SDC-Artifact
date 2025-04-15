@@ -32,7 +32,7 @@ def CombineFiles(data_dir, combined_dataset_filename, interpolated_road_points_s
 
     data_full_path = os.path.join(data_dir, 'executed-10000')
 
-    if os.path.exists(data_full_path):
+    if os.path.exists(os.path.join(data_dir, combined_dataset_filename)):
         return
 
     # iterate all files in the directory
