@@ -18,11 +18,9 @@ from tensorflow.keras.callbacks import EarlyStopping
 from RoadCharacteristics import ExtractRoadCharacteristics
 from DatasetPreprocessing import CombineFiles
 
-
 def load_config(path):
     with open(path, 'r') as file:
         return yaml.safe_load(file)
-
 
 def full_train(road_characteristics):
     angle_data = road_characteristics['segment_angles']
@@ -143,7 +141,7 @@ def train_and_validate(road_characteristics, k_fold):
     print("Training has finished. ", round(time.time() - t0, 2), 's')
 
     metrics_df = pd.DataFrame(performance_metrics)
-    metrics_df.to_csv('cross_validation_results.csv', index=False)
+    metrics_df.to_csv(data_dir + '/cross_validation_results.csv', index=False)
 
 
 def main():
@@ -156,7 +154,7 @@ def main():
 
     interpolated_road_points_size = config.get('interpolated_road_points_size', 197)
 
-    #CombineFiles(data_dir, combined_dataset_filename, interpolated_road_points_size) # combine the files in the dataset within a single JSON file.
+    CombineFiles(data_dir, combined_dataset_filename, interpolated_road_points_size) # combine the files in the dataset within a single JSON file.
 
     combined_dataset_filename = os.path.join(data_dir, combined_dataset_filename)
 
@@ -170,8 +168,6 @@ def main():
 
     else:
         raise ValueError('Undeclared training mode.')
-
-    # RUN TRAINING
 
 
 if __name__ == "__main__":
@@ -193,6 +189,8 @@ if __name__ == "__main__":
     epochs = config.get('parameters', {}).get('epochs', 200)
 
     k_fold = config.get('k_fold', 10)
+
+    data_dir = config.get('data_dir', 'data/')
 
     model_path = config.get('model_dir', 'data/saved_models')
 
