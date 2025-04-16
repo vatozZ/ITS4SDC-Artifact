@@ -12,10 +12,33 @@ class ExtractRoadCharacteristics:
     def get_segment_lengths(self):
         pass
 
+    def process_list_of_dict(self):
+
+        with open(self.test_suite, 'r') as f:
+            testSuite = json.load(f)
+
+        main_list = []
+        for test_case in testSuite:
+            test_instance = {}
+            test_outcome = test_case['meta_data']['test_info']['test_outcome']
+            test_road_points = test_case['road_points']
+            road_points_list = []
+            for trp in test_road_points:
+                road_points_list.append([trp['x'], trp['y']])
+
+            test_instance['road_points'] = road_points_list
+            test_instance['test_outcome'] = test_outcome
+            main_list.append(test_instance)
+
+        return main_list
+
     def get_road_characteristics(self):
 
         with open(self.test_suite, 'r') as f:
             testSuite = json.load(f)
+
+        if '_id' in testSuite[0].keys():
+            testSuite = self.process_list_of_dict()
 
         segment_angles_all_list = []
         segment_lengths_all_list = []

@@ -27,7 +27,7 @@ double click to **download_data_windows** file, it will automatically download t
 On a Linux machine, <br/>
 open the terminal inside of the **ITS4SDC-Artifact** folder and run following command:
 ```bash
-bash download_data.sh
+bash download_data_linux.sh
 ```
 Make sure you have ```curl```. If a compatible extractor (e.g. unrar or WinRAR) is not installed, it will install the **unrar** package.
 
@@ -35,7 +35,7 @@ Make sure you have ```curl```. If a compatible extractor (e.g. unrar or WinRAR) 
 ```
 python -m venv its4sdc_venv
 its4sdc_venv\Scripts\activate # (Windows)
-source /its4sdc_venv/bin/activate # (Linux/Mac)
+source its4sdc_venv/bin/activate # (Linux/Mac)
 
 ```
 
