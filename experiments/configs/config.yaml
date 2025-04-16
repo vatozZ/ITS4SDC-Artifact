@@ -1,10 +1,10 @@
-training_mode: 'full' #'full': no test data, utilize the full testsuite; "crossvalidate" for crossfold validation
+training_mode: 'crossvalidate' #'full': no test data, utilize the full testsuite; "crossvalidate" for crossfold validation
 data_dir: data/
 model_dir: data/saved_models
 experiment_name: bidirectional_lstm
 combined_dataset_filename: 'dataset_combined.json'
 interpolated_road_points_size: 197
-k_fold: 5
+k_fold: 4
 parameters:
   lstm_cells: 220
   learning_rate: 0.001

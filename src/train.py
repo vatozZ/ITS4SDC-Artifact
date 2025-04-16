@@ -48,10 +48,14 @@ def full_train(road_characteristics, config):
     # Train the model
     model.fit(X_train, y_train, batch_size=batch_size, epochs=epochs, verbose=1)
 
+    model_save_file = os.path.join(model_path, 'model_full.h5')
     # Save the model
-    model.save(os.path.join(model_path, 'model_full.h5'))
+    model.save(model_save_file)
 
     print("Training has finished ", round(time.time() - t0,2), "s")
+
+    return model_save_file
+
 
 def train_and_validate(road_characteristics, k_fold, config):
 

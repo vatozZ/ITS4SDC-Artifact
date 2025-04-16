@@ -48,6 +48,7 @@ pip install -r requirements.txt
 
 
 ### 4. Run the Experiment
+To modify the number of epochs or other model hyperparameters prior to training or testing, edit the configuration file located at ```experiments/configs/config.yaml```. 
 The following command will first merge the dataset into a single JSON file (```dataset_combined.json```) and save it under the ```data/``` directory for later use. 
 Then, it will train the LSTM network using that file. If you provide the ```--test_file``` argument for the test file, it will also evaluate performance metrics (accuracy, precision, recall, and F1-score) on the given test file.
 For full training (utilizes the full dataset):
