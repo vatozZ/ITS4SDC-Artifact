@@ -33,7 +33,6 @@ git lfs pull
 
 copy evaluator\sample_tests\sdc-test-data.json ..\
 cd ..
-cd ..
 rmdir /s /q temp_repo
 
 echo Test data downloaded successfully!
