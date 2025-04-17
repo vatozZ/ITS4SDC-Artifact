@@ -33,7 +33,8 @@ Make sure you have ```curl```. If a compatible extractor (e.g. unrar or WinRAR) 
 
 ### (Recommended) Create and activate a virtual environment
 ```
-python -m venv its4sdc_venv
+python -m pip install --upgrade pip # upgrade pip
+python -m venv its4sdc_venv 
 its4sdc_venv\Scripts\activate # (Windows)
 source its4sdc_venv/bin/activate # (Linux/Mac)
 
