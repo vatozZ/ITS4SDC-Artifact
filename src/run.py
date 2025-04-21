@@ -38,13 +38,10 @@ def main(trained_model_file=None, test_file=None, config_path='configs/config.ya
 
     # Train = None ; Test = None => TRAIN ONLY
     if test_file is None and trained_model_file is None:
-        print("CP-1")
         if training_mode == 'crossvalidate':
-            print("CP-A")
             _ = train_and_validate(road_characteristics=road_characteristics, k_fold=k_fold, config=config)
 
         elif training_mode == 'full':
-            print("CP-B")
             _ = full_train(road_characteristics=road_characteristics, config=config)
 
         else:
@@ -52,30 +49,21 @@ def main(trained_model_file=None, test_file=None, config_path='configs/config.ya
 
     # Train = available and Test = Available => DO NOT TRAIN, ONLY TEST
     if test_file is not None and trained_model_file is not None:
-        print("CP-2")
         test_on_trained_data(trained_model_file=trained_model_file, test_file=test_file, data_dir=data_dir)
-        print("CP-2-1")
 
     # Train = None ; Test = Available: TRAIN and TEST
     if test_file is not None and trained_model_file == None:
-        print("CP-3")
         if training_mode == 'crossvalidate':
-            print("CP-C")
             trained_model_file = train_and_validate(road_characteristics=road_characteristics, k_fold=k_fold, config=config)
-            # burdan None gelmiş
-            print("CP-C - 2", trained_model_file)
 
         elif training_mode == 'full':
-            print("CP-D")
             trained_model_file = full_train(road_characteristics=road_characteristics, config=config)
-            print("CP-D 2", trained_model_file)
         else:
             raise ValueError('Undeclared training mode.')
 
         test_on_trained_data(trained_model_file=trained_model_file, test_file=test_file, data_dir=data_dir)
 
     if trained_model_file is not None and test_file is None:
-        print("CP-4")
         raise ValueError("The model has already trained.")
     
     """
