@@ -11,19 +11,6 @@ def load_config(path):
 
 def main(trained_model_file=None, test_file=None, config_path='configs/config.yaml'):
 
-    """
-    Train Test
-    _______________________________________________________
-    None   None     TRAIN ONLY                  TRAIN
-    None    True    TRAIN and TEST              TRAIN-TEST
-    True    None    ----                        ----
-    True    True    NO TRAIN;  ONLY TEST        TEST
-
-    :param trained_model:
-    :param test_file:
-    :return:
-    """
-
     config = load_config(config_path)
 
     data_dir = os.path.join(project_root, config.get('data_dir', 'data/'))
