@@ -22,8 +22,8 @@ class Network:
         self.lr = config.get('parameters', {}).get('learning_rate', 1e-3)
         self.batch_size = config.get('parameters', {}).get('batch_size', 1024)
         self.epochs = config.get('parameters', {}).get('epochs', 200)
-        self.kf = KFold(n_splits=config.get('k_fold', 10), shuffle=True, random_state=42)
-        self.mode = config.get('parameters', {}).get('training_mode', 'cv')
+        self.kf = KFold(n_splits=config.get('k_fold', 5), shuffle=True, random_state=42)
+        self.mode = config.get('parameters', {}).get('training_mode', 'crossvalidate')
         self.angle_data = road_characteristics['segment_angles']
         self.length_data = road_characteristics['segment_lengths']
         self.label_data = road_characteristics['labels']
@@ -95,7 +95,7 @@ class Network:
         else:
             updated_df = pd.DataFrame(performance_metrics)
 
-        updated_df.to_csv(results_path, index=False, sep=';')
+        updated_df.to_csv(results_path, index=False)
 
         print("Model results saved to:", results_path)
 
@@ -103,6 +103,7 @@ class Network:
 
         if self.trained_model_file is not None: # if model file is provided; skip training and do testing.
             self.calculate_prediction()
+            return
 
         # Build the model
         model = Sequential()
@@ -115,18 +116,18 @@ class Network:
 
         mode = self.mode.lower()
 
-        if mode == 'cross-validation':
-            kf = KFold(n_splits=self.kf, shuffle=True, random_state=42)
+        if mode == 'crossvalidate':
+
             fold_num = 1
             performance_metrics = []
 
-            for train_index, validation_index in kf.split(self.features):
+            for train_index, validation_index in self.kf.split(self.features):
                 train_features, validation_features = self.features[train_index], self.features[validation_index]
                 train_labels, validation_labels = self.labels[train_index], self.labels[validation_index]
 
-                model.fit(train_features, train_labels, batch_size=self.batch_size, epochs=self.epochs, validation_data=(validation_features, validation_labels), verbose=1, callbacks=[EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True, verbose=1)])
+                model.fit(train_features, train_labels, batch_size=self.batch_size, epochs=self.epochs, validation_data=(validation_features, validation_labels), verbose=1, callbacks=[EarlyStopping(monitor='val_accuracy', patience=10, restore_best_weights=True, verbose=1)])
 
-                performance_metrics = self.evaluate_fold_performance(fold_number=fold_num, model=model, X_validation = validation_features, y_validation=validation_labels, performance_metrics=performance_metrics)
+                self.evaluate_fold_performance(fold_number=fold_num, model=model, X_validation = validation_features, y_validation=validation_labels, performance_metrics=performance_metrics)
 
                 fold_num += 1
 
@@ -175,12 +176,16 @@ class Network:
 
         print(f"Fold {fold_number} - Accuracy: {accuracy:.2f}, Precision: {precision:.2f}, Recall: {recall:.2f}, F1 Score: {f1:.2f}")
 
+        os.makedirs(os.path.join(self.model_path, 'model_files'), exist_ok=True)
         model.save(os.path.join(self.model_path, 'model_files', f'model_fold_{fold_number}.keras'))
 
         return performance_metrics
 
     def export_trained_model(self, model):
 
+
         model_save_file = os.path.join(self.model_path, 'saved_model_' + self.now, 'model_full.keras')
+
+        os.makedirs(os.path.dirname(model_save_file), exist_ok=True)
 
         model.save(model_save_file)

@@ -26,14 +26,18 @@ def adjust_array_size(array, target_size):
 
         return np.column_stack((interpolated_x, interpolated_y))
 
-def CombineFiles(data_dir, combined_dataset_filename, interpolated_road_points_size):
+def CombineFiles(data_dir, combined_dataset_filename, interpolated_road_points_size, config):
 
     data_list = []
 
     data_full_path = os.path.join(data_dir, 'executed-10000')
 
+    data_full_path = os.path.join(data_dir, config.get('data_folder_name', 'executed-10000'))
+
     if os.path.exists(os.path.join(data_dir, combined_dataset_filename)):
-        return
+        # if it exists, do not waste time for doing it again.
+        print(f"Combined dataset already exists at {combined_dataset_filename}. Skipping merging...")
+        return combined_dataset_filename
 
     # iterate all files in the directory
     for file in tqdm(os.listdir(data_full_path)):
@@ -56,9 +60,11 @@ def CombineFiles(data_dir, combined_dataset_filename, interpolated_road_points_s
 
     data_frame = pd.DataFrame(data_list)
 
+    _filename = os.path.join(data_dir, combined_dataset_filename)
     # write out the dataframe as a JSON file.
-    data_frame.to_json(os.path.join(data_dir, combined_dataset_filename), orient='records', indent=2)
+    data_frame.to_json(_filename, orient='records', indent=2)
 
+    return _filename
 
 
 
