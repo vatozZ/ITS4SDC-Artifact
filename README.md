@@ -35,14 +35,17 @@ Note: Depending on your system, you may need to use ```python``` or ```python3``
 
 ### (Recommended) Create and activate a virtual environment
 ```
-python -m pip install --upgrade pip # upgrade pip
-python -m venv its4sdc_venv 
-its4sdc_venv\Scripts\activate # (Windows)
-source its4sdc_venv/bin/activate # (Linux/Mac)
-
+python -m pip install --upgrade pip 
+python -m venv its4sdc_venv
 ```
-
-
+On Windows
+```
+its4sdc_venv\Scripts\activate
+```
+On Linux/Mac
+```
+source its4sdc_venv/bin/activate
+```
 
 ### 3. Install the dependencies 
 ```
