@@ -31,6 +31,8 @@ bash download_data_linux.sh
 ```
 Make sure you have ```curl```. If a compatible extractor (e.g. unrar or WinRAR) is not installed, it will install the **unrar** package.
 
+Note: Depending on your system, you may need to use ```python``` or ```python3``` for the following commands.
+
 ### (Recommended) Create and activate a virtual environment
 ```
 python -m pip install --upgrade pip # upgrade pip
@@ -39,6 +41,8 @@ its4sdc_venv\Scripts\activate # (Windows)
 source its4sdc_venv/bin/activate # (Linux/Mac)
 
 ```
+
+
 
 ### 3. Install the dependencies 
 ```
