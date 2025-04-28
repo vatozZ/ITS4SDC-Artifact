@@ -9,7 +9,7 @@ def load_config(path):
     with open(path, 'r') as file:
         return yaml.safe_load(file)
 
-def main(trained_model_file=None, test_file=None, config_path='configs/config.yaml'):
+def main(trained_model_file, test_file, config_path, project_root):
 
     config = load_config(config_path)
 
@@ -24,13 +24,11 @@ def main(trained_model_file=None, test_file=None, config_path='configs/config.ya
 
     combined_dataset_filename = CombineFiles(data_dir, combined_dataset_filename, interpolated_road_points_size, config)  # combine the files in the dataset within a single JSON file.
 
-    print("Dataset is combined.")
-
     road_characteristics = ExtractRoadCharacteristics(feature='angles-lengths', combined_dataset_filename=combined_dataset_filename).get_road_characteristics()  # extract the road characteristics that will be used for training.
 
-    print("The road characteristic is extracted.")
+    network = Network(road_characteristics=road_characteristics, config=config, trained_model_file=trained_model_file,
+                      test_file=test_file, project_root=project_root)
 
-    network = Network(road_characteristics=road_characteristics, config=config, trained_model_file=trained_model_file, test_file=test_file)
 
     network.model_pipeline()
 
@@ -48,7 +46,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', type=str, required=False,
-                        default='configs/config.yaml',
+                        default='../configs/config.yaml',
                         help="Path to experiment config file")
 
     parser.add_argument('--test_file', type=str, required=False, help='Test on the trained data.', default=None)
@@ -64,4 +62,4 @@ if __name__ == "__main__":
 
     config = load_config(args.config)
 
-    main(trained_model_file=trained_model_file, test_file=test_file, config_path=args.config)
+    main(trained_model_file=trained_model_file, test_file=test_file, config_path=args.config, project_root=project_root)

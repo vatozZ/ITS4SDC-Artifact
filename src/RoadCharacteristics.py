@@ -34,6 +34,8 @@ class ExtractRoadCharacteristics:
 
     def get_road_characteristics(self):
 
+        print("self.test_suite", self.test_suite)
+
         with open(self.test_suite, 'r') as f:
             testSuite = json.load(f)
 

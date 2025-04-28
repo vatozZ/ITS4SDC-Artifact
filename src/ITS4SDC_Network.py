@@ -13,11 +13,11 @@ import tensorflow as tf
 from src.RoadCharacteristics import ExtractRoadCharacteristics
 
 class Network:
-    def __init__(self, road_characteristics, config, trained_model_file, test_file):
+    def __init__(self, road_characteristics, config, trained_model_file, test_file, project_root):
 
         self.trained_model_file = trained_model_file
         self.test_file = test_file
-
+        self.project_root = project_root
         self.lstm_cells = config.get('parameters', {}).get('lstm_cells', 220)
         self.lr = config.get('parameters', {}).get('learning_rate', 1e-3)
         self.batch_size = config.get('parameters', {}).get('batch_size', 1024)
@@ -31,11 +31,14 @@ class Network:
         self.build_feature_matrix()
 
         # RE-DEFINE
-        self.model_path = config.get('model_dir', 'data/')
-        self.data_dir = config.get('data_dir', 'data/')
         self.now = str(datetime.now().strftime("%Y_%m_%d_%H_%M"))
-        model_path = os.path.join(self.model_path, 'saved_model_' + self.now)
-        confusion_matrix_path = os.path.join(model_path, 'confusion_matrices')
+
+        self.results_dir = os.path.join(self.project_root, config.get('results_dir', 'data/results/'))
+
+        self.model_path = os.path.join(self.results_dir, 'saved_model_' + self.now)
+
+        confusion_matrix_path = os.path.join(self.model_path, 'confusion_matrices')
+
         os.makedirs(confusion_matrix_path, exist_ok=True)
 
     def build_feature_matrix(self):
@@ -86,7 +89,7 @@ class Network:
         print(f"Precision: {prec:.2f}")
         print(f"Recall:    {rec:.2f}")
         print(f"F1 Score:  {f1:.2f}")
-        results_path = os.path.join(self.data_dir, 'test_evaluation_results.csv')
+        results_path = os.path.join(self.results_dir, 'test_evaluation_results.csv')
 
         if os.path.exists(results_path):
             existing_df = pd.read_csv(results_path)
@@ -127,7 +130,7 @@ class Network:
 
                 model.fit(train_features, train_labels, batch_size=self.batch_size, epochs=self.epochs, validation_data=(validation_features, validation_labels), verbose=1, callbacks=[EarlyStopping(monitor='val_accuracy', patience=10, restore_best_weights=True, verbose=1)])
 
-                self.evaluate_fold_performance(fold_number=fold_num, model=model, X_validation = validation_features, y_validation=validation_labels, performance_metrics=performance_metrics)
+                self.evaluate_fold_performance(fold_number=fold_num, model=model, validation_features = validation_features, validation_labels = validation_labels, performance_metrics=performance_metrics)
 
                 fold_num += 1
 
@@ -143,7 +146,9 @@ class Network:
     def export_cv_metrics_to_csv(self, performance_metrics):
 
         metrics_df = pd.DataFrame(performance_metrics)
-        metrics_df.to_csv(self.data_dir + '/cross_validation_results.csv', index=False)
+        results_path = os.path.join(self.model_path, 'cross_validation_results.csv')
+
+        metrics_df.to_csv(results_path, index=False)
 
         best_folds_model_path = max(performance_metrics, key=lambda x: x['f1_score'])['confusion_matrix_file'].replace('confusion_matrices', 'model_files').replace('confusion_matrix_', 'model_fold_').replace('.png', '.keras')
 
@@ -184,7 +189,7 @@ class Network:
     def export_trained_model(self, model):
 
 
-        model_save_file = os.path.join(self.model_path, 'saved_model_' + self.now, 'model_full.keras')
+        model_save_file = os.path.join(self.model_path, 'model_full.keras')
 
         os.makedirs(os.path.dirname(model_save_file), exist_ok=True)
 
