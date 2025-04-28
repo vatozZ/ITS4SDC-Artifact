@@ -7,7 +7,8 @@ from DatasetPreprocessing import CombineFiles
 from ITS4SDC_Network import Network
 
 def load_config(path):
-    with open(path, 'r') as file:
+    full_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), path)
+    with open(full_path, 'r') as file:
         return yaml.safe_load(file)
 
 def main(trained_model_file, test_file, config_path, project_root):
