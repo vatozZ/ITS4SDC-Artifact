@@ -7,8 +7,9 @@ from DatasetPreprocessing import CombineFiles
 from ITS4SDC_Network import Network
 
 def load_config(path):
-    full_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), path)
-    with open(full_path, 'r') as file:
+    if not os.path.isabs(path):
+        path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), path)
+    with open(path, 'r') as file:
         return yaml.safe_load(file)
 
 def main(trained_model_file, test_file, config_path, project_root):
@@ -48,7 +49,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', type=str, required=False,
-                        default='../configs/config.yaml',
+                        default='configs/config.yaml',
                         help="Path to experiment config file")
 
     parser.add_argument('--test_file', type=str, required=False, help='Test on the trained data.', default=None)
