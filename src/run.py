@@ -34,7 +34,6 @@ def main(trained_model_file, test_file, config_path, project_root):
     network = Network(road_characteristics=road_characteristics, config=config, trained_model_file=trained_model_file,
                       test_file=test_file, project_root=project_root)
 
-
     if use_onnx:
         # if onnx use_onnx flag is True, run prediction directly.
         network.run_onnx_prediction()
