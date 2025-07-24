@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import tensorflow as tf
 from src.RoadCharacteristics import ExtractRoadCharacteristics
+import onnxruntime
 
 class Network:
     def __init__(self, road_characteristics, config, trained_model_file, test_file, project_root):
@@ -29,13 +30,14 @@ class Network:
         self.label_data = road_characteristics['labels']
         self.features, self.labels = [], []
         self.build_feature_matrix()
+        self.onnx_model_path = os.path.join(project_root, config.get('onnx_model_file', ''))
 
         # RE-DEFINE
         self.now = str(datetime.now().strftime("%Y_%m_%d_%H_%M"))
 
         self.results_dir = os.path.join(self.project_root, config.get('results_dir', 'data/results/'))
 
-        self.model_path = os.path.join(self.results_dir, 'saved_model_' + self.now)
+        self.model_path = os.path.join(self.results_dir, 'result_' + self.now)
 
         confusion_matrix_path = os.path.join(self.model_path, 'confusion_matrices')
 
@@ -194,3 +196,49 @@ class Network:
         os.makedirs(os.path.dirname(model_save_file), exist_ok=True)
 
         model.save(model_save_file)
+
+    def run_onnx_prediction(self):
+
+        onnxruntime_session = onnxruntime.InferenceSession(self.onnx_model_path)
+        #feature_input_data = np.column_stack((segment_angles, segment_lengths)).astype(np.float32)
+        predicted_test_outcomes = []
+        for i in range(self.features.shape[0]):
+            test_case_feature = self.features[i].astype(np.float32)
+            test_case_label = self.labels[i]
+            test_case_feature = test_case_feature.reshape(1, -1, 2)
+            prediction = onnxruntime_session.run(None, {onnxruntime_session.get_inputs()[0].name: test_case_feature})
+
+            if prediction[0][0][0] < 0.5:
+                predicted_test_outcomes.append(0)
+            else:
+                predicted_test_outcomes.append(1)
+
+        predicted_test_outcomes = np.array(predicted_test_outcomes)
+        cm = confusion_matrix(self.labels, predicted_test_outcomes)
+        disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+        plt.figure()
+        disp.plot()
+        plt.title(f'Confusion Matrix')
+        cm_filename = os.path.join(self.model_path, 'confusion_matrices', f'confusion_matrix.png')
+        plt.savefig(cm_filename, dpi=900, bbox_inches='tight')
+        plt.close()
+
+        # Calculate the performance matrices
+        accuracy = accuracy_score(self.labels, predicted_test_outcomes)
+        precision = precision_score(self.labels, predicted_test_outcomes)
+        recall = recall_score(self.labels, predicted_test_outcomes)
+        f1 = f1_score(self.labels, predicted_test_outcomes)
+        performance_metrics = []
+        performance_metrics.append({
+            'accuracy': accuracy,
+            'precision': precision,
+            'recall': recall,
+            'f1_score': f1,
+            'confusion_matrix_file': cm_filename
+        })
+
+        print(f"Accuracy: {accuracy:.2f}, Precision: {precision:.2f}, Recall: {recall:.2f}, F1 Score: {f1:.2f}")
+
+        metrics_df = pd.DataFrame(performance_metrics)
+        results_path = os.path.join(self.model_path, 'performance_metric_results.csv')
+        metrics_df.to_csv(results_path, index=False)

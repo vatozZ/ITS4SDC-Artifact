@@ -18,8 +18,7 @@ def main(trained_model_file, test_file, config_path, project_root):
 
     data_dir = os.path.join(project_root, config.get('data_dir', 'data/'))
 
-    if trained_model_file is None and test_file is not None:
-        trained_model_file = get_trained_model_file(data_dir=data_dir)
+    use_onnx = config.get('use_onnx', False)
 
     combined_dataset_filename = str(config.get('combined_dataset_filename', 'dataset_combined.json'))
 
@@ -29,11 +28,20 @@ def main(trained_model_file, test_file, config_path, project_root):
 
     road_characteristics = ExtractRoadCharacteristics(feature='angles-lengths', combined_dataset_filename=combined_dataset_filename).get_road_characteristics()  # extract the road characteristics that will be used for training.
 
+    if trained_model_file is None and test_file is not None:
+        trained_model_file = get_trained_model_file(data_dir=data_dir)
+
     network = Network(road_characteristics=road_characteristics, config=config, trained_model_file=trained_model_file,
                       test_file=test_file, project_root=project_root)
 
 
-    network.model_pipeline()
+    if use_onnx:
+        # if onnx use_onnx flag is True, run prediction directly.
+        network.run_onnx_prediction()
+
+    else:
+        # run the model pipeline
+        network.model_pipeline()
 
 
 def get_trained_model_file(data_dir):

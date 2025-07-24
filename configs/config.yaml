@@ -1,10 +1,12 @@
-training_mode: 'crossvalidate' #'full': no test data, utilize the full testsuite; "cv" for cross-validation
+training_mode: 'full' #'full': no test data, utilize the full testsuite; "cv" for cross-validation
 data_dir: data/
 results_dir: data/results/
 experiment_name: bidirectional_lstm
 combined_dataset_filename: 'dataset_combined.json'
 interpolated_road_points_size: 197
 data_folder_name: executed-10000
+onnx_model_file: 'data/onnx_models/its4sdc.onnx'
+use_onnx: false
 k_fold: 5
 parameters:
   lstm_cells: 220
