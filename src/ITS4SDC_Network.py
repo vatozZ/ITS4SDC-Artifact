@@ -204,7 +204,6 @@ class Network:
         predicted_test_outcomes = []
         for i in range(self.features.shape[0]):
             test_case_feature = self.features[i].astype(np.float32)
-            test_case_label = self.labels[i]
             test_case_feature = test_case_feature.reshape(1, -1, 2)
             prediction = onnxruntime_session.run(None, {onnxruntime_session.get_inputs()[0].name: test_case_feature})
 
