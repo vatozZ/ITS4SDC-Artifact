@@ -1,4 +1,4 @@
-training_mode: 'full' #'full': no test data, utilize the full testsuite; "cv" for cross-validation
+training_mode: 'crossvalidate' #'full': no test data, utilize the full testsuite; "crossvalidate" for cross-validation
 data_dir: data/
 results_dir: data/results/
 experiment_name: bidirectional_lstm
