@@ -28,11 +28,11 @@ def main(trained_model_file, test_file, config_path, project_root):
 
     road_characteristics = ExtractRoadCharacteristics(feature='angles-lengths', combined_dataset_filename=combined_dataset_filename).get_road_characteristics()  # extract the road characteristics that will be used for training.
 
-    if trained_model_file is None and test_file is not None:
+    if trained_model_file is None and test_file is not None: # if trained model file is given, use the trained model.
         trained_model_file = get_trained_model_file(data_dir=data_dir)
 
     network = Network(road_characteristics=road_characteristics, config=config, trained_model_file=trained_model_file,
-                      test_file=test_file, project_root=project_root)
+                      test_file=test_file, project_root=project_root, use_onnx=use_onnx)
 
     if use_onnx:
         # if onnx use_onnx flag is True, run prediction directly.

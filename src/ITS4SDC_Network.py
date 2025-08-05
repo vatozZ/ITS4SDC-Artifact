@@ -14,11 +14,19 @@ from src.RoadCharacteristics import ExtractRoadCharacteristics
 import onnxruntime
 
 class Network:
-    def __init__(self, road_characteristics, config, trained_model_file, test_file, project_root):
-
+    def __init__(self, road_characteristics, config, trained_model_file, test_file, project_root, use_onnx):
+        """
+        :param road_characteristics:
+        :param config: config.yaml file path.
+        :param trained_model_file: will be used for the prediction, if it exists.
+        :param test_file: will be used for prediction.
+        :param project_root: the path of the root folder.
+        :param use_onnx: if use_onnx true, the tool directly performs prediction.
+        """
         self.trained_model_file = trained_model_file
         self.test_file = test_file
         self.project_root = project_root
+        self.use_onnx = use_onnx
         self.lstm_cells = config.get('parameters', {}).get('lstm_cells', 220)
         self.lr = config.get('parameters', {}).get('learning_rate', 1e-3)
         self.batch_size = config.get('parameters', {}).get('batch_size', 1024)
@@ -28,6 +36,7 @@ class Network:
         self.angle_data = road_characteristics['segment_angles']
         self.length_data = road_characteristics['segment_lengths']
         self.label_data = road_characteristics['labels']
+        self.test_ids = road_characteristics['test_id']
         self.features, self.labels = [], []
         self.build_feature_matrix()
         self.onnx_model_path = os.path.join(project_root, config.get('onnx_model_file', ''))
@@ -41,7 +50,7 @@ class Network:
 
         confusion_matrix_path = os.path.join(self.model_path, 'confusion_matrices')
 
-        os.makedirs(confusion_matrix_path, exist_ok=True)
+        os.makedirs(self.model_path, exist_ok=True)
 
     def build_feature_matrix(self):
 
@@ -140,7 +149,10 @@ class Network:
 
         elif mode == 'full':
             model.fit(self.features, self.labels, batch_size=self.batch_size, epochs=self.epochs, verbose=1)
-            self.export_trained_model(model)
+
+            model_filename = 'model_full.keras'
+
+            self.export_trained_model(model, os.path.join(self.model_path, model_filename))
 
         else:
             raise ValueError('Undeclared mode.')
@@ -163,7 +175,11 @@ class Network:
         plt.figure()
         disp.plot()
         plt.title(f'Confusion Matrix - Fold {fold_number}')
+
+        os.makedirs(os.path.join(self.model_path, 'confusion_matrices'), exist_ok=True)
+
         cm_filename = os.path.join(self.model_path, 'confusion_matrices', f'confusion_matrix_fold_{fold_number}.png')
+
         plt.savefig(cm_filename, dpi=900, bbox_inches='tight')
         plt.close()
         # Calculate the performance matrices
@@ -183,19 +199,15 @@ class Network:
 
         print(f"Fold {fold_number} - Accuracy: {accuracy:.2f}, Precision: {precision:.2f}, Recall: {recall:.2f}, F1 Score: {f1:.2f}")
 
-        os.makedirs(os.path.join(self.model_path, 'model_files'), exist_ok=True)
-        model.save(os.path.join(self.model_path, 'model_files', f'model_fold_{fold_number}.keras'))
+        self.export_trained_model(model=model, model_filename=os.path.join(self.model_path, 'model_files', f'model_fold_{fold_number}.keras'))
 
         return performance_metrics
 
-    def export_trained_model(self, model):
+    def export_trained_model(self, model, model_filename):
 
+        os.makedirs(os.path.join(self.model_path, 'model_files'), exist_ok=True)
 
-        model_save_file = os.path.join(self.model_path, 'model_full.keras')
-
-        os.makedirs(os.path.dirname(model_save_file), exist_ok=True)
-
-        model.save(model_save_file)
+        model.save(model_filename)
 
     def run_onnx_prediction(self):
 
@@ -213,31 +225,8 @@ class Network:
                 predicted_test_outcomes.append(1)
 
         predicted_test_outcomes = np.array(predicted_test_outcomes)
-        cm = confusion_matrix(self.labels, predicted_test_outcomes)
-        disp = ConfusionMatrixDisplay(confusion_matrix=cm)
-        plt.figure()
-        disp.plot()
-        plt.title(f'Confusion Matrix')
-        cm_filename = os.path.join(self.model_path, 'confusion_matrices', f'confusion_matrix.png')
-        plt.savefig(cm_filename, dpi=900, bbox_inches='tight')
-        plt.close()
 
-        # Calculate the performance matrices
-        accuracy = accuracy_score(self.labels, predicted_test_outcomes)
-        precision = precision_score(self.labels, predicted_test_outcomes)
-        recall = recall_score(self.labels, predicted_test_outcomes)
-        f1 = f1_score(self.labels, predicted_test_outcomes)
-        performance_metrics = []
-        performance_metrics.append({
-            'accuracy': accuracy,
-            'precision': precision,
-            'recall': recall,
-            'f1_score': f1,
-            'confusion_matrix_file': cm_filename
-        })
+        output_filename = os.path.join(self.model_path, 'predicted_outcomes.csv')
 
-        print(f"Accuracy: {accuracy:.2f}, Precision: {precision:.2f}, Recall: {recall:.2f}, F1 Score: {f1:.2f}")
-
-        metrics_df = pd.DataFrame(performance_metrics)
-        results_path = os.path.join(self.model_path, 'performance_metric_results.csv')
-        metrics_df.to_csv(results_path, index=False)
+        df = pd.DataFrame({'Actual': self.labels, 'Predicted Test Outcomes': predicted_test_outcomes, 'Test Id': self.test_ids})
+        df.to_csv(output_filename, index=False)

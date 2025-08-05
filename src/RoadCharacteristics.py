@@ -6,12 +6,6 @@ class ExtractRoadCharacteristics:
         self.feature = feature
         self.test_suite = combined_dataset_filename
 
-    def get_segment_angle_changes(self):
-        pass
-
-    def get_segment_lengths(self):
-        pass
-
     def process_list_of_dict(self):
 
         with open(self.test_suite, 'r') as f:
@@ -34,10 +28,10 @@ class ExtractRoadCharacteristics:
 
     def get_road_characteristics(self):
 
-        print("self.test_suite", self.test_suite)
-
         with open(self.test_suite, 'r') as f:
             testSuite = json.load(f)
+
+        # check if the format is different (example different format is available under data folder)
 
         if '_id' in testSuite[0].keys():
             testSuite = self.process_list_of_dict()
@@ -45,8 +39,10 @@ class ExtractRoadCharacteristics:
         segment_angles_all_list = []
         segment_lengths_all_list = []
         test_outcome_all_list = []
+        test_id_all_list = []
 
         for test_case in testSuite:
+
             roadPointsArray = np.array(test_case['road_points'])
 
             #1) Calculate the segment angles
@@ -74,14 +70,18 @@ class ExtractRoadCharacteristics:
             elif test_case['test_outcome'] == 'PASS':
                 test_outcome_all_list.append(1)
             else:
-                raise ValueError('Test case has not executed yet. Please execute test case to get test outcome.')
+                test_outcome_all_list.append(None)
+                #raise ValueError('Test case has not executed yet. Please execute test case to get test outcome.')
+
+            test_id_all_list.append(test_case['test_id'])
 
         filename = self.test_suite.split('.json')[0] + '_road_characteristics.json'
 
         road_characteristics = \
             {'segment_angles': segment_angles_all_list,
                 'segment_lengths': segment_lengths_all_list,
-                'labels': test_outcome_all_list}
+                'labels': test_outcome_all_list,
+                'test_id': test_id_all_list}
 
         with open(filename, 'w') as f:
             json.dump(road_characteristics, f, indent=4)

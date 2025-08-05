@@ -53,6 +53,7 @@ def CombineFiles(data_dir, combined_dataset_filename, interpolated_road_points_s
                     data_dict['road_points'] = adjust_array_size(np.array(jsonfile['interpolated_road_points']), target_size=interpolated_road_points_size)
 
                 data_dict['test_outcome'] = jsonfile['test_outcome']
+                data_dict['test_id'] = jsonfile['test_id']
 
             data_list.append(data_dict)
 
