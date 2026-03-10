@@ -75,6 +75,15 @@ k_fold: 10
 - Confusion matrices: ```data/saved_models/confusion_matrices```
 - Metrics: ```cross_validation_results.csv```
 
+### Performance Comparison of ONNX and Keras Models
+Table 1: Performance Comparison of ONNX and Keras Models
+
+| Experiment Type | ONNX (s) | Keras(s) |
+|-----------------|----------|----------|
+| Iterative       | 23.20    | 463.67   | 
+| Batch           | 2.90     | 17.73    |
+
+
 ### Dataset Information
 The dataset is available on Zenodo:
 https://zenodo.org/records/14599223 <br/>

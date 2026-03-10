@@ -14,19 +14,19 @@ from src.RoadCharacteristics import ExtractRoadCharacteristics
 import onnxruntime
 
 class Network:
-    def __init__(self, road_characteristics, config, trained_model_file, test_file, project_root, use_onnx):
+    def __init__(self, road_characteristics, config, trained_model_file, test_file, project_root, use_existing_model):
         """
         :param road_characteristics:
         :param config: config.yaml file path.
         :param trained_model_file: will be used for the prediction, if it exists.
         :param test_file: will be used for prediction.
         :param project_root: the path of the root folder.
-        :param use_onnx: if use_onnx true, the tool directly performs prediction.
+        :param use_existing_model: if use_existing_model true, the tool directly performs prediction.
         """
         self.trained_model_file = trained_model_file
         self.test_file = test_file
         self.project_root = project_root
-        self.use_onnx = use_onnx
+        self.use_existing_model = use_existing_model
         self.lstm_cells = config.get('parameters', {}).get('lstm_cells', 220)
         self.lr = config.get('parameters', {}).get('learning_rate', 1e-3)
         self.batch_size = config.get('parameters', {}).get('batch_size', 1024)

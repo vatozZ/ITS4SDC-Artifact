@@ -18,7 +18,7 @@ def main(trained_model_file, test_file, config_path, project_root):
 
     data_dir = os.path.join(project_root, config.get('data_dir', 'data/'))
 
-    use_onnx = config.get('use_onnx', False)
+    use_existing_model = config.get('use_existing_model', False)
 
     combined_dataset_filename = str(config.get('combined_dataset_filename', 'dataset_combined.json'))
 
@@ -32,10 +32,10 @@ def main(trained_model_file, test_file, config_path, project_root):
         trained_model_file = get_trained_model_file(data_dir=data_dir)
 
     network = Network(road_characteristics=road_characteristics, config=config, trained_model_file=trained_model_file,
-                      test_file=test_file, project_root=project_root, use_onnx=use_onnx)
+                      test_file=test_file, project_root=project_root, use_existing_model=use_existing_model)
 
-    if use_onnx:
-        # if onnx use_onnx flag is True, run prediction directly.
+    if use_existing_model:
+        # if onnx use_existing_model flag is True, run prediction directly.
         network.run_onnx_prediction()
 
     else:
