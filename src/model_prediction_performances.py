@@ -11,7 +11,7 @@ import json
 import csv
 
 # provide the onnx model file
-onnx_model_path = '../data/onnx_models/its4sdc.onnx'
+onnx_model_path = '../data/existing_models/its4sdc.onnx'
 onnxruntime_session = onnxruntime.InferenceSession(onnx_model_path)
 
 # provide the keras model file

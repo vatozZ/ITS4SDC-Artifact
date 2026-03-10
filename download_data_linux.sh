@@ -23,7 +23,7 @@ if ! [[ -d "data/executed-10000" ]]; then
       else
           echo "'unrar' not found. Installing..."
           sudo apt install -y unrar
-          exit 1
+          exec "$0"
       fi
 
   elif [[ "$OS" == "MINGW64_NT"* || "$OS" == "CYGWIN"* ]]; then
