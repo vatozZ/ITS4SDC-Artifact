@@ -6,7 +6,7 @@ combined_dataset_filename: 'dataset_combined.json'
 interpolated_road_points_size: 197
 data_folder_name: executed-10000
 onnx_model_file: 'data/existing_models/its4sdc.onnx'
-use_existing_model: true
+use_existing_model: false
 k_fold: 5
 parameters:
   lstm_cells: 220
